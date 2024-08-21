@@ -6,6 +6,8 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ContainerComponent } from '../../componentes/container/container.component';
 import { SeparadorComponent } from '../../componentes/separador/separador.component';
 import { ContatoService } from '../../services/contato.service';
+import { MensagemErroComponent } from '../../componentes/mensagem-erro/mensagem-erro.component';
+import { CabecalhoComponent } from '../../componentes/cabecalho/cabecalho.component';
 
 @Component({
   selector: 'app-formulario-contato',
@@ -15,12 +17,14 @@ import { ContatoService } from '../../services/contato.service';
     ContainerComponent,
     SeparadorComponent,
     ReactiveFormsModule,
-    RouterLink
+    RouterLink,
+    MensagemErroComponent,
+    CabecalhoComponent
   ],
   templateUrl: './formulario-contato.component.html',
   styleUrl: './formulario-contato.component.css'
 })
-export class FormularioContatoComponent implements OnInit {
+export class FormularioContatoComponent implements OnInit{
 
   contatoForm!: FormGroup;
 
@@ -28,7 +32,7 @@ export class FormularioContatoComponent implements OnInit {
     private contatoService: ContatoService,
     private router: Router,
     private activatedRoute: ActivatedRoute
-  ) { }
+    ) {}
 
   ngOnInit() {
     this.inicializarFormulario();
@@ -45,6 +49,14 @@ export class FormularioContatoComponent implements OnInit {
       redes: new FormControl(''),
       observacoes: new FormControl('')
     })
+  }
+
+  obterControle(nome: string): FormControl {
+    const control = this.contatoForm.get(nome)
+    if(!control) {
+      throw new Error('Controle de formulário não encontrado:' + nome)
+    }
+    return control as FormControl
   }
 
   carregarContato() {
@@ -69,7 +81,7 @@ export class FormularioContatoComponent implements OnInit {
 
   aoSelecionarArquivo(event: any) {
     const file: File = event.target.files[0]
-    if (file) {
+    if(file) {
       this.lerArquivo(file)
     }
   }
@@ -77,7 +89,7 @@ export class FormularioContatoComponent implements OnInit {
   lerArquivo(file: File) {
     const reader = new FileReader();
     reader.onload = () => {
-      if (reader.result) {
+      if(reader.result) {
         this.contatoForm.get('avatar')?.setValue(reader.result)
       }
     }
